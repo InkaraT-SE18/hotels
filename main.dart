@@ -5,10 +5,20 @@ import 'pages/bookings_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/notifications_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'auth/auth_gate.dart';
 
-void main() {
-  runApp(const HotelBookingApp ());
+
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const HotelBookingApp());
 }
+
 
 
 class HotelBookingApp extends StatelessWidget {
@@ -18,10 +28,8 @@ class HotelBookingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hotel Booking',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MainScreen(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const AuthGate(),
     );
   }
 }
