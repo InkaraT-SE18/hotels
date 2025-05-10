@@ -77,9 +77,8 @@ class HotelDetailPage extends StatelessWidget {
   ),
 ),
 
-const SizedBox(height: 16), // отступ между картой и кнопками
+const SizedBox(height: 16),
 
-// Кнопка "Посмотреть на карте (Live Location)"
 SizedBox(
   width: double.infinity,
   child: ElevatedButton.icon(
@@ -92,24 +91,26 @@ SizedBox(
       );
     },
     icon: const Icon(Icons.map),
-    label: const Text('Посмотреть на карте (Live Location)'),
+    label: const Text('Map'),
   ),
 ),
 
-const SizedBox(height: 10), // небольшой отступ между кнопками
+const SizedBox(height: 10),
 
 SizedBox(
   width: double.infinity,
   child: ElevatedButton(
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BookingFormPage(hotel: hotel),
-        ),
-      );
-    },
-    child: const Text("Перейти к бронированию"),
+   onPressed: () async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => BookingFormPage(hotel: hotel),
+    ),
+  );
+
+},
+
+    child: const Text("Booking"),
   ),
 ),
 
