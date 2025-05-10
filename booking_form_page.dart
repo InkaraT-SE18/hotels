@@ -17,7 +17,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
   DateTime? _checkInDate;
   DateTime? _checkOutDate;
-  String _roomType = 'Эконом';
+  String _roomType = 'Econom';
   int _guests = 1;
 
   final _guestsController = TextEditingController();
@@ -47,35 +47,40 @@ class _BookingFormPageState extends State<BookingFormPage> {
     }
   }
 
-  void _submitBooking() async {
-    if (_formKey.currentState!.validate() &&
-        _checkInDate != null &&
-        _checkOutDate != null &&
-        _checkOutDate!.isAfter(_checkInDate!)) {
-      
-      _formKey.currentState!.save(); // сохраняем значения из onSaved
+ void _submitBooking() async {
+  if (_formKey.currentState!.validate() &&
+      _checkInDate != null &&
+      _checkOutDate != null &&
+      _checkOutDate!.isAfter(_checkInDate!)) {
+    
+    _formKey.currentState!.save(); 
 
-      final booking = Booking(
-        hotelName: widget.hotel.name,
-        dateRange: "${_checkInDate!.toLocal().toString().split(' ')[0]} — ${_checkOutDate!.toLocal().toString().split(' ')[0]}",
-        roomType: _roomType,
-        guests: _guests,
-      );
+    final booking = Booking(
+      hotelName: widget.hotel.name,
+      dateRange:
+          "${_checkInDate!.toLocal().toString().split(' ')[0]} — ${_checkOutDate!.toLocal().toString().split(' ')[0]}",
+      roomType: _roomType,
+      guests: _guests,
+    );
+await BookingDatabase().create(booking);
+
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(content: Text('Бронирование успешно!')),
+);
+
+Navigator.pop(context, true);
 
     
-      await BookingDatabase.instance.create(booking);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Бронирование успешно!')),
-      );
+    
 
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, выберите корректные даты')),
-      );
-    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Пожалуйста, выберите корректные даты')),
+    );
   }
+}
+
 
   @override
   void dispose() {
@@ -86,28 +91,28 @@ class _BookingFormPageState extends State<BookingFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Бронирование')),
+      appBar: AppBar(title: const Text('Booking')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              Text("Отель: ${widget.hotel.name}", style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(" Hotel: ${widget.hotel.name}", style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
 
               ListTile(
                 title: Text(_checkInDate == null
-                    ? 'Выберите дату заезда'
-                    : 'Заезд: ${_checkInDate!.toLocal().toString().split(' ')[0]}'),
+                    ? 'Choose a check-in date'
+                    : 'Check-in: ${_checkInDate!.toLocal().toString().split(' ')[0]}'),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, true),
               ),
 
               ListTile(
                 title: Text(_checkOutDate == null
-                    ? 'Выберите дату выезда'
-                    : 'Выезд: ${_checkOutDate!.toLocal().toString().split(' ')[0]}'),
+                    ? 'Choose a departure date'
+                    : 'Departure; ${_checkOutDate!.toLocal().toString().split(' ')[0]}'),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, false),
               ),
@@ -115,8 +120,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _roomType,
-                decoration: const InputDecoration(labelText: 'Класс номера'),
-                items: ['Люкс', 'Средний', 'Эконом']
+                decoration: const InputDecoration(labelText: 'Class'),
+                items: ['Lux', 'Comfort','Econom']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
                 onChanged: (value) {
@@ -128,12 +133,12 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
               const SizedBox(height: 16),
               TextFormField(
-                controller: _guestsController,decoration: const InputDecoration(labelText: 'Количество персон'),
+                controller: _guestsController,decoration: const InputDecoration(labelText: 'Number of person'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   final guests = int.tryParse(value ?? '');
                   if (guests == null || guests < 1) {
-                    return 'Введите корректное число гостей';
+                    return 'Please enter the correct number of guests';
                   }
                   return null;
                 },
@@ -148,7 +153,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _submitBooking,
-                child: const Text('Забронировать'),
+                
+                child: const Text('Submit'), 
               )
             ],
           ),
