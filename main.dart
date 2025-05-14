@@ -1,35 +1,81 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'pages/settings_page.dart';
+import 'auth/auth_gate.dart';
+import 'firebase_options.dart';
 import 'pages/home_page.dart';
 import 'pages/bookings_page.dart';
 import 'pages/profile_page.dart';
-import 'pages/settings_page.dart';
 import 'pages/notifications_page.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'auth/auth_gate.dart';
 
+enum AppTheme { light, dark, blue, green }
 
-import 'firebase_options.dart';
+final ValueNotifier<AppTheme> themeNotifier = ValueNotifier(AppTheme.light);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const HotelBookingApp());
 }
-
-
 
 class HotelBookingApp extends StatelessWidget {
   const HotelBookingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hotel Booking',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AuthGate(),
+    return ValueListenableBuilder<AppTheme>(
+      valueListenable: themeNotifier,
+      builder: (_, AppTheme currentTheme, __) {
+        ThemeData themeData;
+        
+        switch (currentTheme) {
+          case AppTheme.dark:
+            themeData = ThemeData.dark();
+            break;
+          case AppTheme.blue:
+            themeData = ThemeData(
+              colorScheme: ColorScheme.light(
+                primary: Colors.blue,
+                secondary: Colors.blueAccent,
+                surface: const Color.fromARGB(255, 170, 189, 220),
+              ),
+              scaffoldBackgroundColor: const Color.fromARGB(255, 207, 235, 255),
+              appBarTheme: AppBarTheme(
+                color: const Color.fromARGB(255, 105, 188, 255),
+                foregroundColor: Colors.white,
+              ),
+            );
+            break;
+          case AppTheme.green:
+            themeData = ThemeData(
+              colorScheme: ColorScheme.light(
+                primary: Colors.green,
+                secondary: Colors.greenAccent,
+                surface: const Color.fromARGB(255, 255, 255, 255),
+              ),
+              scaffoldBackgroundColor: const Color.fromARGB(255, 208, 255, 213),
+              appBarTheme: AppBarTheme(
+                color: const Color.fromARGB(255, 146, 255, 149),
+                foregroundColor: Colors.white,
+              ),
+            );
+            break;
+          case AppTheme.light:
+          themeData = ThemeData.light();
+        }
+        
+        return MaterialApp(
+          title: 'Hotel Booking',
+          debugShowCheckedModeBanner: false,
+          theme: themeData,
+          darkTheme: ThemeData.dark(),
+          themeMode: currentTheme == AppTheme.dark ? ThemeMode.dark : ThemeMode.light,
+          home: const AuthGate(),
+        );
+      },
     );
   }
 }
@@ -45,11 +91,11 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    BookingsPage(),
-    ProfilePage(),
-    SettingsPage(),
-    NotificationsPage()
+    const HomePage(),
+    const BookingsPage(),
+    const ProfilePage(),
+    const SettingsPage(),
+    const NotificationsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -63,7 +109,7 @@ class _MainScreenState extends State<MainScreen> {
     'Booking',
     'Profile',
     'Settings',
-    'Notifications'
+    'Notifications',
   ];
 
   @override
